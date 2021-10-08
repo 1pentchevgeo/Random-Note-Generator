@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <script src="vexflow-min.js"></script>
+    <link rel="stylesheet" href="master.css">
+    <title>Random Note Generator</title>
+  </head>
+  <body>
+    <select id="notequantity" name="notequantity">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+    </select>
+    <button id="generate" type="button" name="generate" onclick="generate()">Generate</button>
+    <div id="notenames"></div>
+    <div id="notation"></div>
+    <script type="text/javascript">
+      function getRandomNote() {
+          var num = Math.floor(Math.random() * 12) + 1;
+          switch (num) {
+            case 1:
+              return "C";
+              break;
+            case 2:
+              if (Math.round(Math.random()) == 1) {
+                return "Db";
+              } else {
+                return "C#";
+              }
+              break;
+            case 3:
+              return "D";
+              break;
+            case 4:
+              if (Math.round(Math.random()) == 1) {
+                return "Eb";
+              } else {
+                return "D#";
+              }
+              break;
+            case 5:
+              return "E";
+              break;
+            case 6:
+              return "F";
+              break;
+            case 7:
+              if (Math.round(Math.random()) == 1) {
+                return "Gb";
+              } else {
+                return "F#";
+              }
+              break;
+            case 8:
+              return "G";
+              break;
+            case 9:
+              if (Math.round(Math.random()) == 1) {
+                return "Ab";
+              } else {
+                return "G#";
+              }
+              break;
+            case 10:
+              return "A";
+              break;
+            case 11:
+              if (Math.round(Math.random()) == 1) {
+                return "Bb";
+              } else {
+                return "A#";
+              }
+              break;
+            case 12:
+              return "B";
+              break;
+            default:
+              return "what";
+          }
+      }
+
+      function generate() {
+        document.getElementById("notation").innerHTML = "";
+
+        VF = Vex.Flow;
+        var WorkspaceInformation = {
+            div: document.getElementById("notation"),
+            canvasWidth: 500,
+            canvasHeight: 500
+        };
+        var renderer = new VF.Renderer(
+            WorkspaceInformation.div,
+            VF.Renderer.Backends.SVG
+        );
+        renderer.resize(WorkspaceInformation.canvasWidth, WorkspaceInformation.canvasHeight);
+        var context = renderer.getContext();
+        context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
+        var stave = new VF.Stave(10, 40, 400);
+        stave.setContext(context).draw();
+
+        var notes = [];
+        var notenames = "";
+
+        for (i=0; i<document.getElementById("notequantity").value; i++) {
+          var note = getRandomNote();
+          notenames += note + " ";
+          var accidental = "";
+          switch (note.slice(-1)) {
+            case "#":
+              accidental = "#";
+              break;
+            case "b":
+              accidental = "b";
+              break;
+            default:
+              accidental = "n";
+
+          }
+          notes.push(new VF.StaveNote({clef: "treble", keys: [note + "/4"], duration: "q" }).addAccidental(0, new VF.Accidental(accidental)).addDotToAll(),);
+        }
+
+        var voice = new VF.Voice({num_beats: notes.length,  beat_value: 4});
+        voice.addTickables(notes);
+        var formatter = new VF.Formatter().joinVoices([voice]).format([voice], 400);
+        voice.draw(context, stave);
+
+        // =====================================================================
+
+        document.getElementById("notenames").innerHTML = notenames;
+      }
+
+    </script>
+  </body>
+</html>
